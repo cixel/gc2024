@@ -1,6 +1,0 @@
-[submodule "fizzbuzz"]
-	path = fizzbuzz
-	url = git@github.com:cixel/fizzbuzz.git
-[submodule "cover"]
-	path = cover
-	url = git@github.com:cixel/cover.git
