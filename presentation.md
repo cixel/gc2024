@@ -179,7 +179,9 @@ func fizzbuzz(n int) string {goCover_4bac6d588efe__1[0] = 5 ; goCover_4bac6d588e
 }​
 ```
 
-^ this is generated right before compilation so it's not really meant for our eyes,
+^ so... this is coverage instrumenation...
+
+^ and it's generated right before compilation so it's not really meant for our eyes,
 
 ^ but I promise not as complicated as it looks.
 
@@ -387,7 +389,7 @@ link -o $WORK/b001/exe/a.out
 
 ![](graph-2.svg)
 
-^ the linker takes the main object file as an argument
+^ which takes the object file for main as an argument
 
 ---
 
@@ -401,7 +403,7 @@ link -o $WORK/b001/exe/a.out
 
 ![](graph-2.svg)
 
-^ and it outputs out an executable
+^ and outputs out an executable.
 
 ^ but the linker also needs to know where to find object files for every other package in the build
 
@@ -547,7 +549,7 @@ compile -o $WORK/b001/_pkg_.a
 
 ^ so that's how the built-in cover tool works.
 
-^ and i've got like 3 minutes left to describe how we can do this ourselves, so buckle in cuz it's gonna get weird.
+^ and i've got like 3 minutes left to describe how we can do this ourselves, so... appologies in advance
 
 ^ [3:45]
 
@@ -575,11 +577,9 @@ compile -o $WORK/b001/_pkg_.a
 
 ![](toolexec-graph.svg)
 
-^ for example, instead of spawning the compiler directly, go will now spawn our tool and tell it how it would've spawned the compiler
+^ for example, instead of running the compiler directly, go will now running our tool and tell it how it would've run the compiler
 
 ^ so now it’s up to us to spawn the compiler, but before and after that, we can kinda do whatever we want
-
-^ And we can do some really stupid stuff with this
 
 ^ we can't directly change the shape of the action graph, but we can change what happens at each node
 
@@ -604,6 +604,8 @@ compile -o $WORK/b001/_pkg_.a
 ^ so we can add a cover variables file
 
 ^ and replace the original source with instrumented source
+
+^ ... which looks like this
 
 ---
 
@@ -645,7 +647,7 @@ func fizzbuzz(n int) string {
 
 ![right](toolexec-graph-2a.svg)
 
-^ now i have to walk through the instrumented source, since it's a little different from what the cover tool does.
+^ i'll explain the differences from what we saw earlier
 
 ^ first,
 
@@ -790,17 +792,12 @@ func _WriteCoverage()
 
 ---
 
-[.code-highlight: 6-9]
+[.code-highlight: 6-14]
 ```go
 package vars
 
 import _ "unsafe"
 import "os"
-
-//go:linkname cover_73_107_XRA0BjRi2VWNrDxFsPct ehden.net/cover/vars.cover_73_107_XRA0BjRi2VWNrDxFsPct
-//go:linkname cover_127_144_XRA0BjRi2VWNrDxFsPct ehden.net/cover/vars.cover_127_144_XRA0BjRi2VWNrDxFsPct
-//go:linkname cover_178_202_XRA0BjRi2VWNrDxFsPct ehden.net/cover/vars.cover_178_202_XRA0BjRi2VWNrDxFsPct
-// ...
 
 // ehden.net/fizzbuzz/fizzbuzz.go:11.2,11.36
 var _cover_73_107_XRA0BjRi2VWNrDxFsPct uint8
@@ -826,21 +823,16 @@ func WriteCoverage() {
 }
 ```
 
-^ it has a bunch of linknames
+^ it's gonna have the variables and the functions which set them
 
 ---
 
-[.code-highlight: 12-21]
+[.code-highlight: 18-28]
 ```go
 package vars
 
 import _ "unsafe"
 import "os"
-
-//go:linkname cover_73_107_XRA0BjRi2VWNrDxFsPct ehden.net/cover/vars.cover_73_107_XRA0BjRi2VWNrDxFsPct
-//go:linkname cover_127_144_XRA0BjRi2VWNrDxFsPct ehden.net/cover/vars.cover_127_144_XRA0BjRi2VWNrDxFsPct
-//go:linkname cover_178_202_XRA0BjRi2VWNrDxFsPct ehden.net/cover/vars.cover_178_202_XRA0BjRi2VWNrDxFsPct
-// ...
 
 // ehden.net/fizzbuzz/fizzbuzz.go:11.2,11.36
 var _cover_73_107_XRA0BjRi2VWNrDxFsPct uint8
@@ -866,49 +858,9 @@ func WriteCoverage() {
 }
 ```
 
-^ ... and then it has the variables and the functions which set them
+^ and it's gonna have the function deferred by main, which prints the value of all those variables to a file.
 
----
-
-[.code-highlight: 23-32]
-```go
-package vars
-
-import _ "unsafe"
-import "os"
-
-//go:linkname cover_73_107_XRA0BjRi2VWNrDxFsPct ehden.net/cover/vars.cover_73_107_XRA0BjRi2VWNrDxFsPct
-//go:linkname cover_127_144_XRA0BjRi2VWNrDxFsPct ehden.net/cover/vars.cover_127_144_XRA0BjRi2VWNrDxFsPct
-//go:linkname cover_178_202_XRA0BjRi2VWNrDxFsPct ehden.net/cover/vars.cover_178_202_XRA0BjRi2VWNrDxFsPct
-// ...
-
-// ehden.net/fizzbuzz/fizzbuzz.go:11.2,11.36
-var _cover_73_107_XRA0BjRi2VWNrDxFsPct uint8
-func cover_73_107_XRA0BjRi2VWNrDxFsPct() { _cover_73_107_XRA0BjRi2VWNrDxFsPct = 1 }
-
-var _cover_127_144_XRA0BjRi2VWNrDxFsPct uint8
-func cover_127_144_XRA0BjRi2VWNrDxFsPct() { _cover_127_144_XRA0BjRi2VWNrDxFsPct = 1 }
-
-var _cover_178_202_XRA0BjRi2VWNrDxFsPct uint8
-func cover_178_202_XRA0BjRi2VWNrDxFsPct() { _cover_178_202_XRA0BjRi2VWNrDxFsPct = 1 }
-
-// ...
-
-func WriteCoverage() {
-	outPath := "cover.out"
-	f, _ := os.Create(outPath)
-	defer f.Close()
-
-	f.WriteString("mode: set\n")
-	f.WriteString("ehden.net/fizzbuzz/fizzbuzz.go:11.2,11.36" + " 1 " + stringFor(_cover_73_107_XRA0BjRi2VWNrDxFsPct) + "\n")
-	f.WriteString("ehden.net/fizzbuzz/fizzbuzz.go:13.3,13.20" + " 1 " + stringFor(_cover_127_144_XRA0BjRi2VWNrDxFsPct) + "\n")
-    // ...
-}
-```
-
-^ and lastly it's got the function deferred by main, which prints the value of all those variables to a file.
-
-^ ... but I'm getting ahead of myself because this file can't exist yet... so here's the problem.
+^ ... but I'm getting ahead of myself because this file can't exist yet. there's a bit of an ordering problem.
 
 ---
 
@@ -925,7 +877,7 @@ func WriteCoverage() {
 - we need to compile this package somehow
     - ... into main
 
-^ but we need to compile this package _into main_ because none of the linkname directives work if these function definitions don't exist somewhere already.
+^ but we need to compile this package _into main_ because none of the linkname directives work if these function definitions don't already exist in an object file referred to by a package that's already in the build
 
 ---
 
@@ -936,7 +888,7 @@ func WriteCoverage() {
         - but it needs to be compiled after main
         - ... woops
 
-^ except that we can't really generate the function definitions until after main is compiled because we might want to instrument any of the other 46 packages in the build and that means we that in order to generate our code we need to know about all of the packages in the build.
+^ except that we can't really generate these function definitions until after main is compiled because we might want to instrument any of the other 46 packages in the build and that means we that in order to generate our code we need to know about all of the packages in the build.
 
 ^ ... and only the linker gets this info.
 
@@ -983,11 +935,11 @@ func WriteCoverage() {
     go list -toolexec cover -export -f {{ .Export }}
     ```
 
-^ then we're gonna build our generated package with go list
+^ then we're gonna build our generated package with go list using the export flag to tell go we need an object file, but
 
-^ the export flag tells go we need an object file
+^ we also need to use the toolexec flag _again_ so that we can do some importcfg patching i don't have time to explain
 
-^ but we also need to use the toolexec flag again so that we can do some importcfg patching i don't have time to explain
+^ next,
 
 ![right](plan-3.svg)
 
@@ -1006,9 +958,9 @@ func WriteCoverage() {
 
 ![right](plan-4.svg)
 
-^ then we're gonna recompile main
+^ we're gonna recompile main, but this time it's gonna import our generated package
 
-^ but this time it's gonna import our made up package
+^ and finally
 
 ---
 
@@ -1026,7 +978,7 @@ func WriteCoverage() {
 
 ![right](plan-5.svg)
 
-^ finally, we need to update the linker's importcfg so it points to our generated package and the new main
+^ we update the linker's importcfg so it points to our generated package and the new main
 
 ---
 
@@ -1045,21 +997,17 @@ func WriteCoverage() {
 
 ![right](plan-5.svg)
 
-^ finally, we need to update the linker's importcfg so it points to our generated package and the new main
-
 ^ ... and that mostly works.
 
----
-
-![right](toolexec-graph-3.svg)
+^ now i'm out of time...
 
 ---
 
 # please talk to me
 
-_email_: ehdens@gmail.com
-
 _gophers slack_: @ehden
+
+_email_: ehdens@gmail.com
 
 _discord_: cixel
 
@@ -1068,4 +1016,10 @@ _discord_: cixel
 [.quote: alignment(right),text-scale(1)]
 > talk materials and code available at
 > github.com/cixel/gc2024
+
+^ but messing with this kind of stuff is pretty much my day job so i can talk about it much faster, for much longer than 7 minutes
+
+^ so please come find me here or reach out to me online and i'm happy to answer any questions.
+
+^ thanks for having me.
 
