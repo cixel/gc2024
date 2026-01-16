@@ -1,6 +1,6 @@
 # Implementing Code Coverage With `-toolexec`
 
-Materials and slides for the talk given at GopherCon 2024.
+Materials and slides for the talk given at GopherCon 2024 ([video recording](https://www.youtube.com/watch?v=kUcP9bu3nLQ)).
 
 Source for slides is in [presentation.md](presentation.md).
 Rendered slides are in [presentation.pdf](presentation.pdf).
